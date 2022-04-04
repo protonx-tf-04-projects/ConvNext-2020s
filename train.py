@@ -1,4 +1,5 @@
-from convnext.model import ConvNeXt, ConvNeXtBase
+from convnext.model import ConvNeXt, ConvNeXtMacro
+from resnet.model import Resnet50
 from tensorflow import keras
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.preprocessing import image_dataset_from_directory
@@ -82,12 +83,16 @@ if __name__ == "__main__":
 
         val_ds = Dataset.from_tensor_slices((x_val, y_val))
         val_ds = val_ds.batch(args.batch_size)
-
-    if args.model == 'base':
-        model = ConvNeXtBase()
+    if args.model == 'resnet50':
+        model = model = Resnet50(input_shape=(args.image_size,
+                             args.image_size, args.image_channels),
+                             num_classes = args.num_classes)
+    elif args.model == 'macro':
+        model = ConvNeXtMacro()
     else:
         model = ConvNeXt(
-            num_classes=args.num_classes
+            num_classes = args.num_classes,
+            image_size = args.image_size
         )
 
     model.build(input_shape=(None, args.image_size,

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     print('Github: thinguyenkhtn')
     print('Email: thinguyenkhtn@gmail.com')
     print('---------------------------------------------------------------------')
-    print('Training CONVNEXT-2020s model with hyper-params:') 
+    print('Training ConvNeXt-2020s model with hyper-params:') 
     print('===========================')
 
     # Loading Model
