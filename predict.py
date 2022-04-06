@@ -16,11 +16,7 @@ if __name__ == "__main__":
     print('Github: ${accout}')
     print('Email: ${email}')
     print('---------------------------------------------------------------------')
-<<<<<<< HEAD
     print('Training ConvNeXt-2020s model with hyper-params:') 
-=======
-    print('Training ${name} model with hyper-params:') # FIXME
->>>>>>> main
     print('===========================')
 
     # FIXME
