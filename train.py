@@ -1,3 +1,12 @@
+from convnext.model import ConvNeXt, ConvNeXtMacro
+from resnet.model import Resnet50
+from tensorflow import keras
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+from tensorflow.python.data import Dataset
+from tensorflow.keras.optimizers import Adam
+import numpy as np
+
 import os
 import tensorflow as tf
 from argparse import ArgumentParser
@@ -32,7 +41,7 @@ if __name__ == "__main__":
 
     print('---------------------Welcome to ConvNext-2020s paper Implementation-------------------')
     print('Github: https://github.com/protonx-tf-04-projects')
-    print('Email: nguyenthanhlinh58@gmail.com')
+    print('Email: thinguyenkhtn@gmail.com, nguyenthanhlinh58@gmail.com')
     print('---------------------------------------------------------------------')
     print('Training ConvNext2020s model with hyper-params:') 
     print('===========================')
@@ -107,4 +116,35 @@ if __name__ == "__main__":
         train_ds = train_ds.batch(batch_size)
 
         val_ds = Dataset.from_tensor_slices((x_val, y_val))
-        val_ds = val_ds.batch(batch_size)
+        val_ds = val_ds.batch(args.batch_size)
+    if args.model == 'resnet50':
+        model = model = Resnet50(input_shape=(args.image_size,
+                             args.image_size, args.image_channels),
+                             num_classes = args.num_classes)
+    elif args.model == 'macro':
+        model = ConvNeXtMacro()
+    else:
+        model = ConvNeXt(
+            num_classes = args.num_classes,
+            image_size = args.image_size
+        )
+
+    model.build(input_shape=(None, args.image_size,
+                             args.image_size, args.image_channels))
+
+    optimizer = Adam(learning_rate=args.lr)
+
+    loss = SparseCategoricalCrossentropy()
+    model.compile(optimizer, loss=loss,
+                  metrics=['accuracy'])
+
+    # Traning
+    model.fit(train_ds,
+              epochs=args.epochs,
+              batch_size=args.batch_size,
+              validation_data=val_ds)
+
+    # Save model
+    model.save(args.model_folder)
+
+
