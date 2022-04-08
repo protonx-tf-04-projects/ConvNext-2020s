@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, BatchNormalization, ReLU, Add
+from tensorflow.keras.layers import Conv2D, BatchNormalization, ReLU, Add, DepthwiseConv2D
 from tensorflow.keras import Model
 
 def basic_block(input, filter_num, stride=1,stage_idx=-1, block_idx=-1):
@@ -71,7 +71,35 @@ def bottleneck_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
   
   return bn3
 
-def resblock(input, filter_num, stride=1, use_bottleneck=False,stage_idx=-1, block_idx=-1):
+def depthwise_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
+  '''ResNeXt use stack of 2 layers: Depthwise_Layer and Pointwise_Layer
+
+  Args:
+    filter_num: the number of filters in the convolution
+    stride: the number of strides in the convolution. stride = 1 if you want
+            output shape is same as input shape
+    stage_idx: index of current stage
+    block_idx: index of current block in stage
+  '''
+  # Depthwise_Layer
+  depthwise=DepthwiseConv2D(kernel_size=3, strides=stride, padding='same')(input)
+  bn1=BatchNormalization(name='conv{}_block{}_1_bn'.format(stage_idx, block_idx))(depthwise)
+  relu1=ReLU(name='conv{}_block{}_1_relu'.format(stage_idx, block_idx))(bn1)
+
+  # Pointwise_Layer
+  conv2=Conv2D(filters=4*filter_num,
+              kernel_size=1,
+              strides=1,
+              padding='same',
+              kernel_initializer='he_normal',
+              name='conv{}_block{}_2_conv'.format(stage_idx, block_idx))(relu1)
+  bn2=BatchNormalization(name='conv{}_block{}_2_bn'.format(stage_idx, block_idx))(conv2)
+  relu2=ReLU(name='conv{}_block{}_2_relu'.format(stage_idx, block_idx))(bn2)
+
+  return relu2
+
+
+def resblock(input, filter_num, stride=1, use_bottleneck=False, use_depthwise=False, stage_idx=-1, block_idx=-1):
   '''A complete `Residual Unit` of ResNet
 
   Args:
@@ -84,6 +112,9 @@ def resblock(input, filter_num, stride=1, use_bottleneck=False,stage_idx=-1, blo
   '''
   if use_bottleneck:
     residual = bottleneck_block(input, filter_num, stride,stage_idx, block_idx)
+    expansion=4
+  elif use_depthwise:
+    residual = depthwise_block(input, filter_num, stride,stage_idx, block_idx)
     expansion=4
   else:
     residual = basic_block(input, filter_num, stride,stage_idx, block_idx)

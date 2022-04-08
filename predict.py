@@ -26,7 +26,7 @@ if __name__ == "__main__":
     model = load_model(args.model_folder)
 
     # Load test image
-    image = preprocessing.image.load_img(args.test_image, target_size=(150, 150))
+    image = preprocessing.image.load_img(args.test_image, target_size=(224, 224))
     input_arr = preprocessing.image.img_to_array(image)
     x = np.array([input_arr])
 

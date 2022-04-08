@@ -1,4 +1,4 @@
-from convnext.model import ConvNeXt, ConvNeXtMacro
+from convnext.model import ConvNeXt, ConvNeXtMacro, ConvNeXtResNeXt
 from resnet.model import Resnet50
 from tensorflow import keras
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
@@ -21,6 +21,10 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     
     # Arguments users used when running command lines
+    parser.add_argument('--model', default='macro', type=str,
+                        help='Type of ConvNeXt model, valid option: resnet50, macro, resnext')
+    parser.add_argument('--lr', default=0.001,
+                        type=float, help='Learning rate')
     parser.add_argument("--batch-size", default=64, type=int)
     parser.add_argument("--epochs", default=1000, type=int)
     parser.add_argument('--num-classes', default=10,
@@ -33,7 +37,9 @@ if __name__ == "__main__":
                         help='Where training data is located')
     parser.add_argument('--valid-folder', default='', type=str,
                         help='Where validation data is located')
-    parser.add_argument('--class-mode', default='categorical', type=str, help='Class mode to compile')  
+    parser.add_argument('--class-mode', default='categorical', type=str, help='Class mode to compile')
+    parser.add_argument('--model-folder', default='output/',
+                        type=str, help='Folder to save trained model')  
 
     args = parser.parse_args()
 
@@ -54,11 +60,13 @@ if __name__ == "__main__":
     valid_folder = args.valid_folder
     batch_size =  args.batch_size
     image_size = args.image_size
-    image_channel = args.image_channels
+    image_channels = args.image_channels
     num_classes = args.num_classes
     epoch = args.epochs
     class_mode = args.class_mode
+    lr = args.lr
 
+    """
     # Data Augmentation is used to expand the training set
     train_datagen = ImageDataGenerator(
         rescale=1./255,
@@ -69,9 +77,11 @@ if __name__ == "__main__":
         zoom_range=0.2)
 
     val_datagen = ImageDataGenerator(rescale=1./255)
+    """
 
     # Data loader
     if args.train_folder != '' and args.valid_folder != '':
+        """
         # Load train images from folder
         train_ds =  train_datagen.flow_from_directory(
             train_folder,
@@ -90,9 +100,22 @@ if __name__ == "__main__":
             batch_size=batch_size,
             class_mode=class_mode
         )
-
-        print('Train label: {}'.format(train_ds.class_indices))
-        print('Val label: {}'.format(val_ds.class_indices))
+        """
+        # Load train images from folder
+        train_ds = image_dataset_from_directory(
+            args.train_folder,
+            seed=123,
+            image_size=(image_size, image_size),
+            shuffle=True,
+            batch_size=batch_size,
+        )
+        val_ds = image_dataset_from_directory(
+            args.valid_folder,
+            seed=123,
+            image_size=(image_size, image_size),
+            shuffle=True,
+            batch_size=args.batch_size,
+        )
     else:
         # If you do not have your own data, you can use the CIFAR-10 dataset
         # The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. 
@@ -107,30 +130,33 @@ if __name__ == "__main__":
         
         # Modify the image size if you do not want to pass the default value (32)
         x_train = (x_train.reshape(-1, image_size, image_size,
-                                   image_channel)).astype(np.float32)
+                                   image_channels)).astype(np.float32)
         x_val = (x_val.reshape(-1, image_size, image_size,
-                               image_channel)).astype(np.float32)
+                               image_channels)).astype(np.float32)
    
         # create dataset
         train_ds = Dataset.from_tensor_slices((x_train, y_train))
         train_ds = train_ds.batch(batch_size)
 
         val_ds = Dataset.from_tensor_slices((x_val, y_val))
-        val_ds = val_ds.batch(args.batch_size)
+        val_ds = val_ds.batch(batch_size)
+
     if args.model == 'resnet50':
-        model = model = Resnet50(input_shape=(args.image_size,
-                             args.image_size, args.image_channels),
-                             num_classes = args.num_classes)
+        model = Resnet50(input_shape=(image_size,
+                             image_size, image_channels),
+                             num_classes = num_classes)
     elif args.model == 'macro':
         model = ConvNeXtMacro()
+    elif args.model == 'resnext':
+        model = ConvNeXtResNeXt();
     else:
         model = ConvNeXt(
-            num_classes = args.num_classes,
-            image_size = args.image_size
+            num_classes = num_classes,
+            image_size = image_size
         )
 
-    model.build(input_shape=(None, args.image_size,
-                             args.image_size, args.image_channels))
+    model.build(input_shape=(None, image_size,
+                             image_size, image_channels))
 
     optimizer = Adam(learning_rate=args.lr)
 
@@ -141,10 +167,8 @@ if __name__ == "__main__":
     # Traning
     model.fit(train_ds,
               epochs=args.epochs,
-              batch_size=args.batch_size,
+              batch_size=batch_size,
               validation_data=val_ds)
 
     # Save model
     model.save(args.model_folder)
-
-
