@@ -1,6 +1,6 @@
 from .block import resblock
 
-def stage(input, filter_num, num_block, use_downsample=True, use_bottleneck=False,stage_idx=-1):
+def stage(input, filter_num, num_block, use_downsample=True, use_bottleneck=False, use_depthwise=False, stage_idx=-1):
   ''' -- Stacking Residual Units on the same stage
 
   Args:
@@ -10,9 +10,11 @@ def stage(input, filter_num, num_block, use_downsample=True, use_bottleneck=Fals
     use_bottleneck: type of block: basic or bottleneck
     stage_idx: index of current stage
   '''
-  net = resblock(input = input, filter_num = filter_num, stride = 2 if use_downsample else 1, use_bottleneck = use_bottleneck, stage_idx = stage_idx, block_idx = 1)
+  net = resblock(input = input, filter_num = filter_num, stride = 2 if use_downsample else 1, use_bottleneck = use_bottleneck, 
+                use_depthwise=use_depthwise, stage_idx = stage_idx, block_idx = 1)
     
   for i in range(1, num_block):
-    net = resblock(input = net, filter_num = filter_num,stride = 1,use_bottleneck = use_bottleneck,stage_idx = stage_idx, block_idx = i+1)
+    net = resblock(input = net, filter_num = filter_num,stride = 1,use_bottleneck = use_bottleneck, 
+                use_depthwise=use_depthwise, stage_idx = stage_idx, block_idx = i+1)
 
   return net

@@ -2,7 +2,7 @@ from .components import stage
 from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, MaxPooling2D, GlobalAveragePooling2D,ReLU, Dense
 from tensorflow.keras import Model
 
-def build_patchify(input_shape,num_classes,layers,use_bottleneck=False):
+def build_patchify(input_shape, num_classes, layers, use_bottleneck=False, use_depthwise=False):
   '''A complete `stage` of ResNet
   '''
   input=Input(input_shape,name='input')
@@ -30,6 +30,7 @@ def build_patchify(input_shape,num_classes,layers,use_bottleneck=False):
               num_block = layers[i],
               use_downsample = i!=0,
               use_bottleneck = use_bottleneck,
+              use_depthwise = use_depthwise,
               stage_idx = i+2)
 
   net=GlobalAveragePooling2D(name='avg_pool')(net)

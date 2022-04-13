@@ -7,7 +7,7 @@ from tensorflow.keras import Sequential
 from resnet import build_patchify
 
 class ConvNeXt(Model):
-    def __init__(self, num_classes=10, image_size=224):
+    def __init__(self, num_classes=10, image_size=224, use_depthwise=False):
         """
             ConvNeXt Model
             Parameters
@@ -21,7 +21,13 @@ class ConvNeXt(Model):
 
         # Compute ratio
         input_shape=(image_size, image_size, 3)
-        self.ratio = build_patchify(input_shape,num_classes,[3,3,9,3],use_bottleneck=True)
+
+        # For ResNeXt-ify
+        if use_depthwise:
+            self.ratio = build_patchify(input_shape,num_classes,[3,3,9,3],use_bottleneck=False, use_depthwise=use_depthwise)
+        # For Macro
+        else:
+            self.ratio = build_patchify(input_shape,num_classes,[3,3,9,3],use_bottleneck=True)
 
     def call(self, inputs):       
         # ratio
@@ -33,4 +39,8 @@ class ConvNeXt(Model):
 
 class ConvNeXtMacro(ConvNeXt):
     def __init__(self, num_classes=10, image_size=224):
-        super().__init__(num_classes=num_classes, image_size=image_size)
+        super().__init__(num_classes=num_classes, image_size=image_size, use_depthwise=False)
+
+class ConvNeXtResNeXt(ConvNeXt):
+    def __init__(self, num_classes=10, image_size=224):
+        super().__init__(num_classes=num_classes, image_size=image_size, use_depthwise=True)
