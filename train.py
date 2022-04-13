@@ -1,4 +1,4 @@
-from convnext.model import ConvNeXt, ConvNeXtMacro, ConvNeXtResNeXt
+from convnext.model import ConvNeXt, ConvNeXtTiny, ConvNeXtSmall, PlayThroughResNeXt, PlayThroughMacro, PlayThroughInvertedBottleneck, PlayThroughLargeKernel
 from resnet.model import Resnet50
 from tensorflow import keras
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
@@ -141,19 +141,31 @@ if __name__ == "__main__":
         val_ds = Dataset.from_tensor_slices((x_val, y_val))
         val_ds = val_ds.batch(batch_size)
 
-    if args.model == 'resnet50':
+    # ConvNeXt
+    if args.model == 'tiny':
+        model = ConvNeXtTiny()
+    elif args.model == 'small':
+        model = ConvNeXtSmall()
+
+    # PlayThrough model --->>>
+    elif args.model == 'resnet50':
         model = Resnet50(input_shape=(image_size,
                              image_size, image_channels),
                              num_classes = num_classes)
     elif args.model == 'macro':
-        model = ConvNeXtMacro()
+        model = PlayThroughMacro()
     elif args.model == 'resnext':
-        model = ConvNeXtResNeXt();
+        model =PlayThroughResNeXt();
+    elif args.model == 'invertedbottleneck':
+        model = PlayThroughInvertedBottleneck();
+    elif args.model == 'largekernel':
+        model = PlayThroughLargeKernel();
     else:
         model = ConvNeXt(
             num_classes = num_classes,
             image_size = image_size
         )
+    # PlayThrough model --->>>
 
     model.build(input_shape=(None, image_size,
                              image_size, image_channels))

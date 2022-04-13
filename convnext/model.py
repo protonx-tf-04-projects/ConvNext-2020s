@@ -1,13 +1,8 @@
-from cgitb import reset
-from tensorflow.keras import Sequential
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from tensorflow.keras.layers.experimental.preprocessing import Resizing, RandomFlip, RandomRotation, RandomZoom, Rescaling
-from tensorflow.keras import Sequential
-from resnet import build_patchify
+from resnet import build_patchify, build_convnext
 
 class ConvNeXt(Model):
-    def __init__(self, num_classes=10, image_size=224, use_depthwise=False):
+    def __init__(self, num_classes=10, image_size=224, layer=[3,3,9,3], model='tiny'):
         """
             ConvNeXt Model
             Parameters
@@ -22,12 +17,7 @@ class ConvNeXt(Model):
         # Compute ratio
         input_shape=(image_size, image_size, 3)
 
-        # For ResNeXt-ify
-        if use_depthwise:
-            self.ratio = build_patchify(input_shape,num_classes,[3,3,9,3],use_bottleneck=False, use_depthwise=use_depthwise)
-        # For Macro
-        else:
-            self.ratio = build_patchify(input_shape,num_classes,[3,3,9,3],use_bottleneck=True)
+        self.ratio = build_convnext(input_shape,num_classes,layer,model_name=model)       
 
     def call(self, inputs):       
         # ratio
@@ -37,10 +27,65 @@ class ConvNeXt(Model):
 
         return output
 
-class ConvNeXtMacro(ConvNeXt):
+class ConvNeXtTiny(ConvNeXt):
     def __init__(self, num_classes=10, image_size=224):
-        super().__init__(num_classes=num_classes, image_size=image_size, use_depthwise=False)
+        super().__init__(num_classes=num_classes, image_size=image_size, layer=[3,3,9,3], model='tiny')
 
-class ConvNeXtResNeXt(ConvNeXt):
+class ConvNeXtSmall(ConvNeXt):
     def __init__(self, num_classes=10, image_size=224):
-        super().__init__(num_classes=num_classes, image_size=image_size, use_depthwise=True)
+        super().__init__(num_classes=num_classes, image_size=image_size, layer=[3,3,27,3], model='small')
+
+class ConvNeXtBig(ConvNeXt):
+    def __init__(self, num_classes=10, image_size=224):
+        super().__init__(num_classes=num_classes, image_size=image_size, layer=[3,3,27,3], model='big')
+
+class ConvNeXtLarge(ConvNeXt):
+    def __init__(self, num_classes=10, image_size=224):
+        super().__init__(num_classes=num_classes, image_size=image_size, layer=[3,3,27,3], model='large')
+
+class ConvNeXtMXLarge(ConvNeXt):
+    def __init__(self, num_classes=10, image_size=224):
+        super().__init__(num_classes=num_classes, image_size=image_size, layer=[3,3,27,3], model='xlarge')
+
+class PlayThrough(Model):
+    def __init__(self, num_classes=10, image_size=224, layer=[3,3,9,3], model='marco'):
+        """
+            PlayThrough Model
+            Parameters
+            ----------
+            num_classes:
+                number of classes
+            image_size: int,
+                size of a image (H or W)
+        """
+        super(PlayThrough, self).__init__()
+
+        # Compute ratio
+        input_shape=(image_size, image_size, 3)
+
+        self.ratio = build_patchify(input_shape,num_classes,layer,model_name=model)
+
+    def call(self, inputs):       
+        # ratio
+        # output shape: (..., num_classes)
+
+        output = self.ratio(inputs)
+
+        return output
+
+class PlayThroughMacro(PlayThrough):
+    def __init__(self, num_classes=10, image_size=224, model='marco'):
+        super().__init__(num_classes=num_classes, image_size=image_size, model=model)
+
+class PlayThroughResNeXt(PlayThrough):
+    def __init__(self, num_classes=10, image_size=224, model='resnext'):
+        super().__init__(num_classes=num_classes, image_size=image_size, model=model)
+
+class PlayThroughInvertedBottleneck(PlayThrough):
+    def __init__(self, num_classes=10, image_size=224, model='invertedbottleneck'):
+        super().__init__(num_classes=num_classes, image_size=image_size, model=model)
+
+class PlayThroughLargeKernel(PlayThrough):
+    def __init__(self, num_classes=10, image_size=224, model='largekernel'):
+        super().__init__(num_classes=num_classes, image_size=image_size, model=model)
+
