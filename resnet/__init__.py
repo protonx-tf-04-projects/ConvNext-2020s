@@ -1,1 +1,1 @@
-from .model import build_patchify
+from .model import build_convnext
