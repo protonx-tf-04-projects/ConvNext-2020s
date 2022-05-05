@@ -19,7 +19,7 @@ def micro_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
         stage_idx, block_idx))(depthwise)
 
     # Pointwise_Layer
-    conv1 = Conv2D(filters=filter_num,
+    conv1 = Conv2D(filters=4*filter_num,
                    kernel_size=1,
                    strides=1,
                    padding='same',
@@ -28,7 +28,7 @@ def micro_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
     gelu = tf.nn.gelu(conv1)
 
     # Pointwise_Layer
-    conv2 = Conv2D(filters=4*filter_num,
+    conv2 = Conv2D(filters=filter_num,
                    kernel_size=1,
                    strides=1,
                    padding='same',
@@ -49,13 +49,13 @@ def resblock(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
     '''
     
     residual = micro_block(input, filter_num, stride, stage_idx, block_idx)
-    expansion = 4
+    #expansion = 4
 
     shortcut = input
     # use projection short cut when dimensions increase
     if stride > 1 or input.shape[3] != residual.shape[3]:
-        shortcut = Conv2D(expansion*filter_num,
-                          kernel_size=1,
+        shortcut = Conv2D(filter_num,
+                          kernel_size=2,
                           strides=stride,
                           padding='valid',
                           kernel_initializer='he_normal',
