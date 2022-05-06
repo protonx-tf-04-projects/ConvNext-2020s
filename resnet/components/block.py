@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, BatchNormalization, LayerNormalization, ReLU, Add, DepthwiseConv2D
 from tensorflow.keras import Model
 
+
 def micro_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
     '''Large Kernel use stack of 2 layers: Depthwise_Layer and Pointwise_Layer
 
@@ -12,9 +13,18 @@ def micro_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
       stage_idx: index of current stage
       block_idx: index of current block in stage
     '''
+    # Downsample
+    down = Conv2D(filters=filter_num,
+                  kernel_size=2,
+                  strides=stride,
+                  padding='same',
+                  kernel_initializer='he_normal',
+                  name='conv{}_block{}_downsample_conv'.format(stage_idx, block_idx))(input)
+
     # Depthwise_Layer
     depthwise = DepthwiseConv2D(
-        kernel_size=7, strides=stride, padding='same')(input)
+        kernel_size=7, strides=stride, padding='same')(down)
+
     nn1 = LayerNormalization(name='conv{}_block{}_1_nn'.format(
         stage_idx, block_idx))(depthwise)
 
@@ -37,6 +47,7 @@ def micro_block(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
 
     return conv2
 
+
 def resblock(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
     '''A complete `Residual Unit` of ResNet
 
@@ -47,24 +58,34 @@ def resblock(input, filter_num, stride=1, stage_idx=-1, block_idx=-1):
       stage_idx: index of current stage
       block_idx: index of current block in stage
     '''
-    
-    residual = micro_block(input, filter_num, stride, stage_idx, block_idx)
-    #expansion = 4
 
-    shortcut = input
+    residual = micro_block(input, filter_num, stride, stage_idx, block_idx)
+
+    down = input
+    if stride > 1 or input.shape[3] != residual.shape[3]:
+        down = Conv2D(filter_num,
+                    kernel_size=4,
+                    strides=4,
+                    padding='same',
+                    kernel_initializer='he_normal',
+                    name='conv{}_block{}_projection-shortcut_conv'.format(stage_idx, block_idx))(input)
+
+    """
     # use projection short cut when dimensions increase
     if stride > 1 or input.shape[3] != residual.shape[3]:
-        shortcut = Conv2D(filter_num,
+        down = Conv2D(filter_num,
                           kernel_size=2,
                           strides=stride,
                           padding='valid',
                           kernel_initializer='he_normal',
                           name='conv{}_block{}_projection-shortcut_conv'.format(stage_idx, block_idx))(input)
-
+        
         shortcut = BatchNormalization(
             name='conv{}_block{}_projection-shortcut_bn'.format(stage_idx, block_idx))(shortcut)
+        
+    """
 
     output = Add(name='conv{}_block{}_add'.format(
-        stage_idx, block_idx))([residual, shortcut])
+        stage_idx, block_idx))([down, residual])
 
     return ReLU(name='conv{}_block{}_relu'.format(stage_idx, block_idx))(output)
