@@ -1,19 +1,32 @@
-from .block import resblock
+from .block import resblock, downsampleblock
 
-def stage(input, filter_num, num_block, use_downsample=True, stage_idx=-1):
+def downsample(input, filter_num, block_idx, stage_idx=-1):
     ''' -- Stacking Residual Units on the same stage
 
     Args:
       filter_num: the number of filters in the convolution used during stage
       num_block: number of `Residual Unit` in a stage
-      use_downsample: Down-sampling is performed by conv3_1, conv4_1, and conv5_1 with a stride of 2
       stage_idx: index of current stage
     '''
-    net = resblock(input=input, filter_num=filter_num, stride=2 if use_downsample else 1,
-                   stage_idx=stage_idx, block_idx=1)
 
+    net = input
+    net = downsampleblock(input=net, filter_num=filter_num,
+                       stage_idx=stage_idx, block_idx=block_idx)
+
+    return net
+
+def stage(input, filter_num, num_block, stage_idx=-1):
+    ''' -- Stacking Residual Units on the same stage
+
+    Args:
+      filter_num: the number of filters in the convolution used during stage
+      num_block: number of `Residual Unit` in a stage
+      stage_idx: index of current stage
+    '''
+
+    net = input
     for i in range(1, num_block):
-        net = resblock(input=net, filter_num=filter_num, stride=1,
+        net = resblock(input=net, filter_num=filter_num,
                        stage_idx=stage_idx, block_idx=i+1)
 
     return net

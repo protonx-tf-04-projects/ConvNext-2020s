@@ -1,2 +1,2 @@
-from .stage import stage
+from .stage import stage, downsample
 
