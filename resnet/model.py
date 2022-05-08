@@ -1,4 +1,4 @@
-from .components import stage
+from .components import stage, downsample
 from tensorflow.keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dense, LayerNormalization
 from tensorflow.keras import Model
 
@@ -28,10 +28,13 @@ def build_convnext(input_shape, num_classes, layers, model_name='tiny'):
         filters = [256, 512, 1024, 2048]
 
     for i in range(len(filters)):
+        net = downsample(input=net,
+                    filter_num=filters[i],
+                    block_idx=i,
+                    stage_idx=i+2)
         net = stage(input=net,
                     filter_num=filters[i],
                     num_block=layers[i],
-                    use_downsample=i != 0,
                     stage_idx=i+2)
 
     net = GlobalAveragePooling2D(name='avg_pool')(net)

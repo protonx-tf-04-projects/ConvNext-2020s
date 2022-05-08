@@ -12,8 +12,8 @@ if __name__ == "__main__":
     parser = ArgumentParser()
 
     # Arguments users used when running command lines
-    parser.add_argument('--model', default='macro', type=str,
-                        help='Type of ConvNeXt model, valid option: resnet50, macro, resnext')
+    parser.add_argument('--model', default='tiny', type=str,
+                        help='Type of ConvNeXt model, valid option: tiny, small, big, large, xlarge')
     parser.add_argument('--lr', default=0.001,
                         type=float, help='Learning rate')
     parser.add_argument("--batch-size", default=64, type=int)
