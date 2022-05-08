@@ -25,7 +25,7 @@ def stage(input, filter_num, num_block, stage_idx=-1):
     '''
 
     net = input
-    for i in range(1, num_block):
+    for i in range(num_block):
         net = resblock(input=net, filter_num=filter_num,
                        stage_idx=stage_idx, block_idx=i+1)
 
