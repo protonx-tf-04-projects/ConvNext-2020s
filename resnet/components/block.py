@@ -1,6 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, BatchNormalization, LayerNormalization, ReLU, Add, DepthwiseConv2D
-from tensorflow.keras import Model
+from tensorflow.keras.layers import Conv2D, LayerNormalization, ReLU, Add, DepthwiseConv2D
 
 def downsampleblock(input, filter_num, stage_idx=-1, block_idx=-1):
     '''A complete `Downsample` of ResNet
