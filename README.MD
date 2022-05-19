@@ -1,9 +1,12 @@
-# Project Name <--- FIXME
+# A ConvNet for the 2020s
+
+Our implementation of paper: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545), using [tensorflow 2](https://www.tensorflow.org/)
 
 Library Logo <--- **FIXME**
 
 <p align="center">
-    <img src='https://storage.googleapis.com/protonx-cloud-storage/transformer/protonx-transf.png' width=200 class="center">
+    <img src='figures/ConvNeXt.png' width=400 class="center">
+    <img src='figures/ConvNeXtModel.png' width=400 class="center">
 </p>
 
 Description about your project. Why do you choose to build this?  <--- **FIXME**
@@ -14,65 +17,80 @@ Architecture Image <--- **FIXME**
 
 
 Authors:
-- Github: members github name <--- **FIXME**
-- Email: members emails <--- **FIXME**
+- Github: thinguyenkhtn
+- Email: thinguyenkhtn@gmail.com
 
 Advisors:
-- Github: advisor github name <--- **FIXME**
-- Email: advisor emails <--- **FIXME**
+- Github: https://github.com/bangoc123
+- Email: protonxai@gmail.com
 
 ## I.  Set up environment
-- Step 1: <--- **FIXME**
+- Step 1: Make sure you have installed Miniconda. If not yet, see the setup document [here](https://conda.io/en/latest/user-guide/install/index.html#regular-installation).
 
-```python
-conda env create -f environment.yml
-```
-
-- Step 2: <--- **FIXME**
-```
-
-```
-
-- Step 3: <--- **FIXME**
-
-```
-
-``` 
+- Step 1: Clone this repository: `git clone https://github.com/protonx-tf-04-projects/ConvNext-2020s`
 
 ## II.  Set up your dataset
 
-- Guide user how to download your data and set the data pipeline <--- **FIXME**
-- References: [NLP](https://github.com/bangoc123/transformer) and [CV](https://github.com/bangoc123/mlp-mixer)
+<!-- - Guide user how to download your data and set the data pipeline  -->
+1. Download the data:
+- Download dataset [here](https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip)
+2. Extract file and put folder ```train``` and ```validation``` to ```./data``` 
+- train folder was used for the training process
+- validation folder was used for validating training result after each epoch
+
+This library use ImageDataGenerator API from Tensorflow 2.0 to load images. Make sure you have some understanding of how it works via [its document](https://keras.io/api/preprocessing/image/)
+Structure of these folders in ```./data```
+
+```
+train/
+...cats/
+......cat.0.jpg
+......cat.1.jpg
+...dogs/
+......dog.0.jpg
+......dog.1.jpg
+```
+
+```
+validation/
+...cats/
+......cat.2000.jpg
+......cat.2001.jpg
+...dogs/
+......dog.2000.jpg
+......dog.2001.jpg
+```
+
+<!-- - References: [NLP](https://github.com/bangoc123/transformer) and [CV](https://github.com/bangoc123/mlp-mixer) -->
 
 ## III. Training Process
 
-
-**FIXME**
-
 Training script:
-
 
 ```python
 
 python train.py --epochs ${epochs} --input-lang en --target-lang vi --input-path ${path_to_en_text_file} --target-path ${path_to_vi_text_file}
 
 ```
-**FIXME**
 
 Example:
 
 ```python
 
-!python train.py --train-folder ${train_folder} --valid-folder ${valid_folder} --num-classes 2 --patch-size 5 --image-size 150 --lr 0.0001 --epochs 200 --num-heads 12 
+!python train.py --train-folder ${train_folder} --valid-folder ${valid_folder} --num-classes 2 --image-size 224 --lr 0.0001 --model tiny --epochs 30
 
 ``` 
-**FIXME**
 
 There are some important arguments for the script you should consider when running it:
 
 - `train-folder`: The folder of training data
 - `valid-folder`: The folder of validation data
-- ...
+- `model-folder`: Where the model after training saved
+- `num-classes`: The number of your problem classes.
+- `batch-size`: The batch size of the dataset
+- `image-size`: The image size of the dataset
+- `lr`: The learning rate
+- `model`: Type of ConvNeXt model, valid option: tiny, small, base, large, xlarge
 
 ## IV. Predict Process
 

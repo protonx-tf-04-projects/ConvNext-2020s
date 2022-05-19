@@ -1,4 +1,4 @@
-from convnext.model import ConvNeXt, ConvNeXtTiny, ConvNeXtSmall, ConvNeXtBig, ConvNeXtLarge, ConvNeXtMXLarge
+from convnext.model import ConvNeXt, ConvNeXtBase, ConvNeXtTiny, ConvNeXtSmall, ConvNeXtBase, ConvNeXtLarge, ConvNeXtMXLarge
 from tensorflow import keras
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.preprocessing import image_dataset_from_directory
@@ -7,16 +7,19 @@ from tensorflow.keras.optimizers import Adam
 import numpy as np
 from argparse import ArgumentParser
 from tensorflow.keras.callbacks import ModelCheckpoint
+import tensorflow_addons as tfa
 
 if __name__ == "__main__":
     parser = ArgumentParser()
 
     # Arguments users used when running command lines
     parser.add_argument('--model', default='tiny', type=str,
-                        help='Type of ConvNeXt model, valid option: tiny, small, big, large, xlarge')
+                        help='Type of ConvNeXt model, valid option: tiny, small, base, large, xlarge')
     parser.add_argument('--lr', default=0.001,
                         type=float, help='Learning rate')
-    parser.add_argument("--batch-size", default=64, type=int)
+    parser.add_argument('--weight-decay', default=1e-4,
+                        type=float, help='Weight decay')
+    parser.add_argument("--batch-size", default=32, type=int)
     parser.add_argument("--epochs", default=1000, type=int)
     parser.add_argument('--num-classes', default=10,
                         type=int, help='Number of classes')
@@ -38,7 +41,7 @@ if __name__ == "__main__":
     # Project Description
 
     print('---------------------Welcome to ConvNext-2020s paper Implementation-------------------')
-    print('Github: https://github.com/protonx-tf-04-projects')
+    print('Github: thinguyenkhtn')
     print('Email: thinguyenkhtn@gmail.com')
     print('---------------------------------------------------------------------')
     print('Training ConvNext2020s model with hyper-params:')
@@ -57,23 +60,24 @@ if __name__ == "__main__":
     epoch = args.epochs
     class_mode = args.class_mode
     lr = args.lr
+    weight_decay = args.weight_decay
 
     # Data loader
-    if args.train_folder != '' and args.valid_folder != '':
+    if train_folder != '' and valid_folder != '':
         # Load train images from folder
         train_ds = image_dataset_from_directory(
-            args.train_folder,
+            train_folder,
             seed=123,
             image_size=(image_size, image_size),
             shuffle=True,
             batch_size=batch_size,
         )
         val_ds = image_dataset_from_directory(
-            args.valid_folder,
+            valid_folder,
             seed=123,
             image_size=(image_size, image_size),
             shuffle=True,
-            batch_size=args.batch_size,
+            batch_size=batch_size,
         )
     else:
         # If you do not have your own data, you can use the CIFAR-10 dataset
@@ -105,8 +109,8 @@ if __name__ == "__main__":
         model = ConvNeXtTiny()
     elif args.model == 'small':
         model = ConvNeXtSmall()
-    elif args.model == 'big':
-        model = ConvNeXtBig()
+    elif args.model == 'base':
+        model = ConvNeXtBase()
     elif args.model == 'large':
         model = ConvNeXtLarge()
     elif args.model == 'xlarge':
@@ -120,9 +124,10 @@ if __name__ == "__main__":
     model.build(input_shape=(None, image_size,
                              image_size, image_channels))
 
-    optimizer = Adam(learning_rate=args.lr)
+    optimizer = Adam(learning_rate=lr)
 
     loss = SparseCategoricalCrossentropy()
+
     model.compile(optimizer, loss=loss,
                   metrics=['accuracy'])
 
@@ -135,7 +140,7 @@ if __name__ == "__main__":
 
     # Traning
     model.fit(train_ds,
-              epochs=args.epochs,
+              epochs=epoch,
               batch_size=batch_size,
               validation_data=val_ds,
               callbacks=[best_model])
