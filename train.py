@@ -1,12 +1,9 @@
-from convnext.model import ConvNeXt, ConvNeXtBase, ConvNeXtTiny, ConvNeXtSmall, ConvNeXtBase, ConvNeXtLarge, ConvNeXtMXLarge
-from tensorflow import keras
+from convnext.model import ConvNeXt, ConvNeXtTiny, ConvNeXtSmall, ConvNeXtBase, ConvNeXtLarge, ConvNeXtMXLarge
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.keras.preprocessing import image_dataset_from_directory
-from tensorflow.python.data import Dataset
 from tensorflow.keras.optimizers import Adam
-import numpy as np
 from argparse import ArgumentParser
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import  ModelCheckpoint
+from keras_preprocessing.image import ImageDataGenerator
 import tensorflow_addons as tfa
 
 if __name__ == "__main__":
@@ -31,7 +28,7 @@ if __name__ == "__main__":
                         help='Where training data is located')
     parser.add_argument('--valid-folder', default='', type=str,
                         help='Where validation data is located')
-    parser.add_argument('--class-mode', default='categorical',
+    parser.add_argument('--class-mode', default='sparse',
                         type=str, help='Class mode to compile')
     parser.add_argument('--model-folder', default='output/',
                         type=str, help='Folder to save trained model')
@@ -63,46 +60,17 @@ if __name__ == "__main__":
     weight_decay = args.weight_decay
 
     # Data loader
-    if train_folder != '' and valid_folder != '':
-        # Load train images from folder
-        train_ds = image_dataset_from_directory(
-            train_folder,
-            seed=123,
-            image_size=(image_size, image_size),
-            shuffle=True,
-            batch_size=batch_size,
-        )
-        val_ds = image_dataset_from_directory(
-            valid_folder,
-            seed=123,
-            image_size=(image_size, image_size),
-            shuffle=True,
-            batch_size=batch_size,
-        )
-    else:
-        # If you do not have your own data, you can use the CIFAR-10 dataset
-        # The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class.
-        # There are 50000 training images and 10000 test images.
-        print("Data folder is not set. Use CIFAR 10 dataset")
+    training_datagen = ImageDataGenerator(
+        rescale=1. / 255,
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2)
+    val_datagen = ImageDataGenerator(rescale=1. / 255)
 
-        num_classes = 10
-
-        # We should pass the image size (--image-size) argument to running command is 32x32x3 while using Cifar10
-        # For example: python .\train.py  --num-classes 2 --batch-size 10 --image-size 32  --epochs 200
-        (x_train, y_train), (x_val, y_val) = keras.datasets.cifar10.load_data()
-
-        # Modify the image size if you do not want to pass the default value (32)
-        x_train = (x_train.reshape(-1, image_size, image_size,
-                                   image_channels)).astype(np.float32)
-        x_val = (x_val.reshape(-1, image_size, image_size,
-                               image_channels)).astype(np.float32)
-
-        # create dataset
-        train_ds = Dataset.from_tensor_slices((x_train, y_train))
-        train_ds = train_ds.batch(batch_size)
-
-        val_ds = Dataset.from_tensor_slices((x_val, y_val))
-        val_ds = val_ds.batch(batch_size)
+    train_generator = training_datagen.flow_from_directory(train_folder, target_size=(image_size, image_size), batch_size= batch_size, class_mode = class_mode )
+    val_generator = val_datagen.flow_from_directory(valid_folder, target_size=(image_size, image_size), batch_size= batch_size, class_mode = class_mode)
 
     # ConvNeXt
     if args.model == 'tiny':
@@ -124,26 +92,26 @@ if __name__ == "__main__":
     model.build(input_shape=(None, image_size,
                              image_size, image_channels))
 
-    optimizer = Adam(learning_rate=lr)
+    optimizer = tfa.optimizers.AdamW(
+        learning_rate=lr, weight_decay=weight_decay)
 
-    loss = SparseCategoricalCrossentropy()
-
-    model.compile(optimizer, loss=loss,
-                  metrics=['accuracy'])
-
+    model.compile(optimizer=optimizer, 
+                loss=SparseCategoricalCrossentropy(),
+                metrics=['accuracy'])
+    
     best_model = ModelCheckpoint(args.model_folder,
                                  save_weights_only=False,
                                  monitor='val_accuracy',
                                  verbose=1,
                                  mode='max',
                                  save_best_only=True)
-
     # Traning
-    model.fit(train_ds,
-              epochs=epoch,
-              batch_size=batch_size,
-              validation_data=val_ds,
-              callbacks=[best_model])
+    model.fit(
+        train_generator,
+        epochs=args.epochs,
+        verbose=1,
+        validation_data=val_generator,
+        callbacks=[best_model])
 
     # Save model
     model.save(args.model_folder)

@@ -71,4 +71,4 @@ def resblock(input, filter_num, stage_idx=-1, block_idx=-1):
     output = Add(name='conv{}_block{}_add'.format(
         stage_idx, block_idx))([input, residual])
 
-    return ReLU(name='conv{}_block{}_relu'.format(stage_idx, block_idx))(output)
+    return output

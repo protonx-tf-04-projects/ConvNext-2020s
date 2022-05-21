@@ -2,19 +2,21 @@
 
 Our implementation of paper: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545), using [tensorflow 2](https://www.tensorflow.org/)
 
-Library Logo <--- **FIXME**
+<p align="center">
+    <img src='figures/Logo.png' width=200 class="center">
+</p>
+
+This library is part of our project: Building an AI library with ProtonX
+
+ConvNeXt Architecture :
 
 <p align="center">
     <img src='figures/ConvNeXt.png' width=400 class="center">
-    <img src='figures/ConvNeXtModel.png' width=400 class="center">
 </p>
 
-Description about your project. Why do you choose to build this?  <--- **FIXME**
-
-Slide about your project (if it's available) <--- **FIXME**
-
-Architecture Image <--- **FIXME**
-
+<p align="center">
+    <img src='figures/ConvNeXtModel.png' width=400 class="center">
+</p>
 
 Authors:
 - Github: thinguyenkhtn
@@ -100,45 +102,45 @@ python predict.py --test-data ${link_to_test_data}
 
 ## V. Result and Comparision
 
-**FIXME**
-
 Your implementation
 ```
-Epoch 7/10
-782/782 [==============================] - 261s 334ms/step - loss: 0.8315 - acc: 0.8565 - val_loss: 0.8357 - val_acc: 0.7978
-Epoch 8/10
-782/782 [==============================] - 261s 334ms/step - loss: 0.3182 - acc: 0.8930 - val_loss: 0.6161 - val_acc: 0.8047
-Epoch 9/10
-782/782 [==============================] - 261s 333ms/step - loss: 1.1965 - acc: 0.8946 - val_loss: 3.9842 - val_acc: 0.7855
-Epoch 10/10
-782/782 [==============================] - 261s 333ms/step - loss: 0.4717 - acc: 0.8878 - val_loss: 0.4894 - val_acc: 0.8262
-
-```
-
-**FIXME**
-
-Other architecture
-
-```
-Epoch 6/10
-391/391 [==============================] - 115s 292ms/step - loss: 0.1999 - acc: 0.9277 - val_loss: 0.4719 - val_acc: 0.8130
-Epoch 7/10
-391/391 [==============================] - 114s 291ms/step - loss: 0.1526 - acc: 0.9494 - val_loss: 0.5224 - val_acc: 0.8318
-Epoch 8/10
-391/391 [==============================] - 115s 293ms/step - loss: 0.1441 - acc: 0.9513 - val_loss: 0.5811 - val_acc: 0.7875
-```
-
-Your comments about these results <--- **FIXME**
-
+Epoch 195: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1756 - accuracy: 0.9300 - val_loss: 0.5760 - val_accuracy: 0.7930
+Epoch 196/200
+63/63 [==============================] - ETA: 0s - loss: 0.1788 - accuracy: 0.9270
+Epoch 196: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1788 - accuracy: 0.9270 - val_loss: 0.5847 - val_accuracy: 0.7890
+Epoch 197/200
+63/63 [==============================] - ETA: 0s - loss: 0.1796 - accuracy: 0.9290
+Epoch 197: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1796 - accuracy: 0.9290 - val_loss: 0.5185 - val_accuracy: 0.7840
+Epoch 198/200
+63/63 [==============================] - ETA: 0s - loss: 0.1768 - accuracy: 0.9290
+Epoch 198: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1768 - accuracy: 0.9290 - val_loss: 0.5624 - val_accuracy: 0.7870
+Epoch 199/200
+63/63 [==============================] - ETA: 0s - loss: 0.1744 - accuracy: 0.9340
+Epoch 199: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1744 - accuracy: 0.9340 - val_loss: 0.5416 - val_accuracy: 0.7790
+Epoch 200/200
+63/63 [==============================] - ETA: 0s - loss: 0.1995 - accuracy: 0.9230
+Epoch 200: val_accuracy did not improve from 0.81000
+63/63 [==============================] - 74s 1s/step - loss: 0.1995 - accuracy: 0.9230 - val_loss: 0.4909 - val_accuracy: 0.7930
 
 ## VI. Running Test
 
-When you want to modify the model, you need to run the test to make sure your change does not affect the whole system.
-
-In the `./folder-name` **(FIXME)** folder please run:
+We offer a script for testing a model using a new image via a command line:
 
 ```bash
-pytest
+python predict.py --test-image ${test_image_path}
+```
+
+where `test_image_path` is the path of your test image.
+
+Example:
+
+```bash
+python predict.py --test-image ./data/test/cat.2000.jpg
 ```
 
 
