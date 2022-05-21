@@ -16,17 +16,6 @@ class ConvNeXt(Model):
                 size of a image (H or W)
         """
         super(ConvNeXt, self).__init__()
-        # Data augmentation
-        self.data_augmentation = Sequential([
-            Rescaling(scale=1./255),
-            Resizing(image_size, image_size),
-            RandomFlip("horizontal"),
-            RandomRotation(factor=0.02),
-            RandomZoom(
-                height_factor=0.2, width_factor=0.2
-            ),
-        ])
-
         # Compute ratio
         input_shape = (image_size, image_size, 3)
 
@@ -36,11 +25,7 @@ class ConvNeXt(Model):
     def call(self, inputs):
         # ratio
         # output shape: (..., num_classes)
-        # Create augmented data
-        # augmented shape: (..., image_size, image_size, c)
-        augmented = self.data_augmentation(inputs)
-
-        output = self.ratio(augmented)
+        output = self.ratio(inputs)
 
         return output
 
