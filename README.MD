@@ -126,21 +126,9 @@ Epoch 200/200
 63/63 [==============================] - ETA: 0s - loss: 0.1995 - accuracy: 0.9230
 Epoch 200: val_accuracy did not improve from 0.81000
 63/63 [==============================] - 74s 1s/step - loss: 0.1995 - accuracy: 0.9230 - val_loss: 0.4909 - val_accuracy: 0.7930
-
-## VI. Running Test
-
-We offer a script for testing a model using a new image via a command line:
-
-```bash
-python predict.py --test-image ${test_image_path}
 ```
 
-where `test_image_path` is the path of your test image.
-
-Example:
-
-```bash
-python predict.py --test-image ./data/test/cat.2000.jpg
-```
+## VI. Feedback
+If you meet any issues when using this library, please let us know via the issues submission tab.
 
 
