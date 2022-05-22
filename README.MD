@@ -67,6 +67,10 @@ validation/
 
 ## III. Training Process
 
+Review training on colab:
+
+<a href="https://colab.research.google.com/drive/1nKz8n11atRgP_TkIoixEVSYVhyhAC5qN?usp=sharing"><img src="https://storage.googleapis.com/protonx-cloud-storage/colab_favicon_256px.png" width=80> </a>
+
 Training script:
 
 ```python
