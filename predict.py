@@ -1,6 +1,5 @@
 from tensorflow.keras.models import load_model
 from tensorflow.keras import preprocessing
-import tensorflow as tf
 from argparse import ArgumentParser
 import numpy as np
 
