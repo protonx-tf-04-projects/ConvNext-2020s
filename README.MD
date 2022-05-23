@@ -25,6 +25,9 @@ Authors:
 Advisors:
 - Github: https://github.com/bangoc123
 - Email: protonxai@gmail.com
+Reviewers:
+- @Khoi: https://github.com/NKNK-vn
+- @Quynh: https://github.com/quynhtl
 
 ## I.  Set up environment
 - Step 1: Make sure you have installed Miniconda. If not yet, see the setup document [here](https://conda.io/en/latest/user-guide/install/index.html#regular-installation).
