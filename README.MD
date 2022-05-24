@@ -79,15 +79,15 @@ Training script:
 
 ```python
 
-python train.py --epochs ${epochs} --input-lang en --target-lang vi --input-path ${path_to_en_text_file} --target-path ${path_to_vi_text_file}
+!python train.py --train-folder ${train_folder} --valid-folder ${valid_folder} --num-classes ${num-classes} --image-size ${image-size} --lr ${lr} --batch-size ${batch-size} --model ${model} --epochs ${epochs}
 
-```
+``` 
 
 Example:
 
 ```python
 
-!python train.py --train-folder ${train_folder} --valid-folder ${valid_folder} --num-classes 2 --image-size 224 --lr 0.0001 --model tiny --epochs 30
+!python train.py --train-folder $train_folder --valid-folder $valid_folder --num-classes 2 --image-size 224 --lr 0.0001 --batch-size 32 --model tiny --epochs ${epochs}
 
 ``` 
 
