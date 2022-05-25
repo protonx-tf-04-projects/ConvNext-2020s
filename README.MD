@@ -33,7 +33,7 @@ Reviewers:
 ## I.  Set up environment
 - Step 1: Make sure you have installed Miniconda. If not yet, see the setup document [here](https://conda.io/en/latest/user-guide/install/index.html#regular-installation).
 
-- Step 1: Clone this repository: `git clone https://github.com/protonx-tf-04-projects/ConvNext-2020s`
+- Step 2: Clone this repository: `git clone https://github.com/protonx-tf-04-projects/ConvNext-2020s`
 
 ## II.  Set up your dataset
 
