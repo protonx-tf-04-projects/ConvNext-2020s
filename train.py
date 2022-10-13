@@ -74,15 +74,30 @@ if __name__ == "__main__":
 
     # ConvNeXt
     if args.model == 'tiny':
-        model = ConvNeXtTiny()
+        model = ConvNeXtTiny(
+            num_classes=num_classes,
+            image_size=image_size
+        )
     elif args.model == 'small':
-        model = ConvNeXtSmall()
+        model = ConvNeXtSmall(
+            num_classes=num_classes,
+            image_size=image_size
+        )
     elif args.model == 'base':
-        model = ConvNeXtBase()
+        model = ConvNeXtBase(
+            num_classes=num_classes,
+            image_size=image_size
+        )
     elif args.model == 'large':
-        model = ConvNeXtLarge()
+        model = ConvNeXtLarge(
+            num_classes=num_classes,
+            image_size=image_size
+        )
     elif args.model == 'xlarge':
-        model = ConvNeXtMXLarge()
+        model = ConvNeXtMXLarge(
+            num_classes=num_classes,
+            image_size=image_size
+        )
     else:
         model = ConvNeXt(
             num_classes=num_classes,
@@ -95,10 +110,10 @@ if __name__ == "__main__":
     optimizer = tfa.optimizers.AdamW(
         learning_rate=lr, weight_decay=weight_decay)
 
-    model.compile(optimizer=optimizer, 
+    model.compile(optimizer=optimizer,
                 loss=SparseCategoricalCrossentropy(),
                 metrics=['accuracy'])
-    
+
     best_model = ModelCheckpoint(args.model_folder,
                                  save_weights_only=False,
                                  monitor='val_accuracy',
